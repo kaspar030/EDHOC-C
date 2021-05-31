@@ -13,16 +13,6 @@
 #error "No X509 backend enabled"
 #endif
 
-#if defined(NANOCBOR)
-
-#include <nanocbor/nanocbor.h>
-
-#elif defined(EMPTY_CBOR)
-#else
-#error "No CBOR backend enabled"
-#endif
-
-
 #define CBOR_ARRAY_INFO_LEN              (4)
 
 void format_msg1_init(edhoc_msg1_t *msg1) {
@@ -111,13 +101,7 @@ static int verify_cipher_suite(uint8_t preferredSuite, const uint8_t *alternativ
 ssize_t format_msg1_encode(const edhoc_msg1_t *msg1, uint8_t *out, size_t olen) {
     ssize_t ret;
 
-#if defined(NANOCBOR)
-    nanocbor_encoder_t encoder;
-#elif defined(EMPTY_CBOR)
-    int encoder;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_encoder_t encoder;
 
     cbor_init_encoder(&encoder, out, olen);
 
@@ -171,15 +155,8 @@ int format_msg1_decode(edhoc_msg1_t *msg1, const uint8_t *in, size_t ilen) {
 
     const uint8_t *p;
 
-#if defined(NANOCBOR)
-    nanocbor_encoder_t decoder;
-    nanocbor_encoder_t arr;
-#elif defined(EMPTY_CBOR)
-    int decoder;
-    int arr;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_decoder_t decoder;
+    cbor_decoder_t arr;
 
     // set up the decoder context
     cbor_init_decoder(&decoder, in, ilen);
@@ -255,13 +232,7 @@ int format_msg1_decode(edhoc_msg1_t *msg1, const uint8_t *in, size_t ilen) {
 ssize_t format_msg2_encode(const edhoc_msg2_t *msg2, corr_t corr, uint8_t *out, size_t olen) {
     ssize_t ret;
 
-#if defined(NANOCBOR)
-    nanocbor_encoder_t encoder;
-#elif defined(EMPTY_CBOR)
-    int encoder;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_encoder_t encoder;
 
     if ((ret = format_data2_encode(&msg2->data2, corr, out, olen)) < 0) {
         EDHOC_FAIL(ret);
@@ -284,13 +255,7 @@ int format_msg2_decode(edhoc_msg2_t *msg2,
     int ret;
     const uint8_t *p;
 
-#if defined(NANOCBOR)
-    nanocbor_encoder_t decoder;
-#elif defined(EMPTY_CBOR)
-    int decoder;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_decoder_t decoder;
 
     cbor_init_decoder(&decoder, msg2Buf, msg2Len);
 
@@ -353,13 +318,7 @@ int format_msg2_decode(edhoc_msg2_t *msg2,
 ssize_t format_msg3_encode(const edhoc_msg3_t *msg3, corr_t corr, uint8_t *out, size_t olen) {
     ssize_t ret;
 
-#if defined(NANOCBOR)
-    nanocbor_encoder_t encoder;
-#elif defined(EMPTY_CBOR)
-    int encoder;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_encoder_t encoder;
 
     if ((ret = format_data3_encode(&msg3->data3, corr, out, olen)) < 0) {
         EDHOC_FAIL(ret);
@@ -377,13 +336,7 @@ ssize_t format_msg3_encode(const edhoc_msg3_t *msg3, corr_t corr, uint8_t *out, 
 int format_msg3_decode(edhoc_msg3_t *msg3, corr_t corr, const uint8_t *msg3_buf, size_t msg3_len) {
     int ret;
 
-#if defined(NANOCBOR)
-    nanocbor_encoder_t decoder;
-#elif defined(EMPTY_CBOR)
-    int decoder;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_decoder_t decoder;
 
     cbor_init_decoder(&decoder, msg3_buf, msg3_len);
 
@@ -411,13 +364,7 @@ int format_msg3_decode(edhoc_msg3_t *msg3, corr_t corr, const uint8_t *msg3_buf,
 }
 
 ssize_t format_data2_encode(const edhoc_data2_t *data2, corr_t corr, uint8_t *out, size_t olen) {
-#if defined(NANOCBOR)
-    nanocbor_encoder_t encoder;
-#elif defined(EMPTY_CBOR)
-    int encoder;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_encoder_t encoder;
 
     int ret;
     cbor_init_encoder(&encoder, out, olen);
@@ -449,13 +396,7 @@ ssize_t format_data2_encode(const edhoc_data2_t *data2, corr_t corr, uint8_t *ou
 ssize_t format_data3_encode(const edhoc_data3_t *data3, corr_t corr, uint8_t *out, size_t olen) {
     int ret;
 
-#if defined(NANOCBOR)
-    nanocbor_encoder_t encoder;
-#elif defined(EMPTY_CBOR)
-    int encoder;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_encoder_t encoder;
 
     cbor_init_encoder(&encoder, out, olen);
 
@@ -479,13 +420,7 @@ ssize_t format_info_encode(cose_algo_id_t id,
                            size_t len,
                            uint8_t *out,
                            size_t olen) {
-#if defined(NANOCBOR)
-    nanocbor_encoder_t encoder;
-#elif defined(EMPTY_CBOR)
-    int encoder;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_encoder_t encoder;
 
     cbor_init_encoder(&encoder, out, olen);
 
@@ -505,13 +440,7 @@ ssize_t format_external_data_encode(const uint8_t *th,
                                     uint8_t *out,
                                     size_t olen) {
     ssize_t ret, offset;
-#if defined(NANOCBOR)
-    nanocbor_encoder_t enc;
-#elif defined(EMPTY_CBOR)
-    int enc;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_encoder_t enc;
 
     cbor_init_encoder(&enc, out, olen);
     cbor_put_bstr(&enc, th, EDHOC_DIGEST_SIZE);
@@ -551,15 +480,8 @@ int format_plaintext23_decode(edhoc_plaintext23_t *plaintext, uint8_t *in, size_
     int ret;
     int8_t cborType;
 
-#if defined(NANOCBOR)
-    nanocbor_value_t dec;
-    nanocbor_value_t _dec;
-#elif defined(EMPTY_CBOR)
-    int dec;
-    int _dec;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_decoder_t dec;
+    cbor_decoder_t _dec;
 
     cbor_init_decoder(&dec, in, ilen);
 
@@ -605,13 +527,7 @@ ssize_t format_plaintext23_encode(const edhoc_plaintext23_t *plaintext, uint8_t 
 
     int headerItems;
 
-#if defined(NANOCBOR)
-    nanocbor_encoder_t enc;
-#elif defined(EMPTY_CBOR)
-    int enc;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_encoder_t enc;
 
     offset = 0;
 
@@ -664,13 +580,7 @@ ssize_t format_plaintext23_encode(const edhoc_plaintext23_t *plaintext, uint8_t 
 ssize_t format_error_msg_encode(const edhoc_error_msg_t *errMsg, uint8_t *out, size_t olen) {
     ssize_t ret;
 
-#if defined(NANOCBOR)
-    nanocbor_encoder_t enc;
-#elif defined(EMPTY_CBOR)
-    int enc;
-#else
-#error "No CBOR backend enabled"
-#endif
+    cbor_encoder_t enc;
 
     cbor_init_encoder(&enc, out, olen);
 
